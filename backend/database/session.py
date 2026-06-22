@@ -9,8 +9,13 @@ DATABASE_URL = os.getenv(
 )
 
 # Create engine and session factories
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # Declarative base class for models
 Base = declarative_base()

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from backend.api.routers import all_routers
 from backend.utils.custom_logger import setup_logger
+from backend.utils.tracing import TracingMiddleware
 
 # Setup structured logger
 logger = setup_logger("api.main")
@@ -13,6 +14,9 @@ app = FastAPI(
     description="Backend API for crawling, pattern analysis, and RAG React-Tailwind code generation.",
     version="1.0.0"
 )
+
+# Mount request tracing middleware
+app.add_middleware(TracingMiddleware)
 
 # Configure CORS for local Next.js client
 app.add_middleware(
@@ -54,7 +58,3 @@ def global_exception_handler(request: Request, exc: Exception):
 for router in all_routers:
     app.include_router(router)
 
-@app.get("/health", tags=["system"])
-def health_check():
-    logger.debug("Health check requested")
-    return {"status": "healthy", "service": "api"}
