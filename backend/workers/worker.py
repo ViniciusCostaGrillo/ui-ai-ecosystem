@@ -98,12 +98,14 @@ class BackgroundWorker:
                 db.commit()
 
             # Retrieve or create job
+            task_type = task.get("task_type", "crawler_pipeline")
+            job_name = "prompt_generation" if task_type == "prompt_generation" else "pipeline_run"
             job = None
             if job_id:
                 job = db.query(Job).filter(Job.id == job_id).first()
             if not job:
                 job = Job(
-                    name="pipeline_run",
+                    name=job_name,
                     status="processing",
                     execution_id=execution_id
                 )
@@ -113,68 +115,100 @@ class BackgroundWorker:
                 job_id = job.id
             else:
                 job.status = "processing"
+                job.name = job_name
                 db.commit()
 
-            # Log start event
-            db.add(Log(
-                execution_id=execution_id,
-                job_id=job_id,
-                level="INFO",
-                message=f"Starting multi-agent execution pipeline for project {project_id} (url={url})."
-            ))
-            db.commit()
-
-            # Run LangGraph pipeline
-            from backend.agents.langgraph_agent import LangGraphAgent
-            from backend.schemas.agents import AgentRunContext
-            
-            context = AgentRunContext(
-                html_content=payload.get("html_content"),
-                css_content=payload.get("css_content"),
-                screenshot_path=payload.get("screenshot_path"),
-                target_framework=target_framework,
-                metadata={"url": url, "project_id": str(project_id)}
-            )
-            
-            pipeline = LangGraphAgent()
-            result = pipeline.run(context)
-            
-            # Write agent messages logs
-            for msg in result.messages:
+            if task_type == "prompt_generation":
+                # Log start event
                 db.add(Log(
                     execution_id=execution_id,
                     job_id=job_id,
                     level="INFO",
-                    message=f"[{msg.sender}]: {msg.content}"
+                    message=f"Starting prompt-to-code generation pipeline for project {project_id} (prompt='{payload.get('prompt', '')}')."
                 ))
-            
-            if result.success:
-                logger.info(f"Task ID={task.get('task_id')} completed successfully.")
+                db.commit()
+
+                from backend.agents.generation_agent import GenerationAgent
+                agent = GenerationAgent()
+                result_data = agent.run(
+                    prompt=payload.get("prompt", ""),
+                    project_id=str(project_id),
+                    execution_id=str(execution_id)
+                )
+
                 execution.status = "completed"
                 execution.finished_at = datetime.utcnow()
-                execution.result = result.output_data
+                execution.result = result_data
                 job.status = "success"
-                
+
                 db.add(Log(
                     execution_id=execution_id,
                     job_id=job_id,
                     level="INFO",
-                    message="Multi-agent execution pipeline completed successfully."
+                    message="Prompt-to-code generation pipeline completed successfully. Code indexed."
                 ))
             else:
-                error_msg = result.metadata.get("error") or "Unknown error"
-                logger.error(f"Task ID={task.get('task_id')} failed: {error_msg}")
-                execution.status = "failed"
-                execution.error_message = error_msg
-                execution.finished_at = datetime.utcnow()
-                job.status = "failed"
-                
+                # Log start event
                 db.add(Log(
                     execution_id=execution_id,
                     job_id=job_id,
-                    level="ERROR",
-                    message=f"Multi-agent execution pipeline failed: {error_msg}."
+                    level="INFO",
+                    message=f"Starting multi-agent execution pipeline for project {project_id} (url={url})."
                 ))
+                db.commit()
+
+                # Run LangGraph pipeline
+                from backend.agents.langgraph_agent import LangGraphAgent
+                from backend.schemas.agents import AgentRunContext
+                
+                context = AgentRunContext(
+                    html_content=payload.get("html_content"),
+                    css_content=payload.get("css_content"),
+                    screenshot_path=payload.get("screenshot_path"),
+                    target_framework=target_framework,
+                    metadata={"url": url, "project_id": str(project_id)}
+                )
+                
+                pipeline = LangGraphAgent()
+                result = pipeline.run(context)
+                
+                # Write agent messages logs
+                for msg in result.messages:
+                    db.add(Log(
+                        execution_id=execution_id,
+                        job_id=job_id,
+                        level="INFO",
+                        message=f"[{msg.sender}]: {msg.content}"
+                    ))
+                
+                if result.success:
+                    logger.info(f"Task ID={task.get('task_id')} completed successfully.")
+                    execution.status = "completed"
+                    execution.finished_at = datetime.utcnow()
+                    execution.result = result.output_data
+                    job.status = "success"
+                    
+                    db.add(Log(
+                        execution_id=execution_id,
+                        job_id=job_id,
+                        level="INFO",
+                        message="Multi-agent execution pipeline completed successfully."
+                    ))
+                else:
+                    error_msg = result.metadata.get("error") or "Unknown error"
+                    logger.error(f"Task ID={task.get('task_id')} failed: {error_msg}")
+                    execution.status = "failed"
+                    execution.error_message = error_msg
+                    execution.finished_at = datetime.utcnow()
+                    job.status = "failed"
+                    
+                    db.add(Log(
+                        execution_id=execution_id,
+                        job_id=job_id,
+                        level="ERROR",
+                        message=f"Multi-agent execution pipeline failed: {error_msg}."
+                    ))
+
                 
             db.commit()
         except Exception as e:

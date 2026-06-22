@@ -362,3 +362,951 @@ Criar tratamento de exceções.
 Utilizar Docker em todos os módulos.
 Priorizar escalabilidade horizontal.
 Construir um sistema semelhante ao Lovable, Bolt e v0.
+
+
+# UPDATE — PHASE 26 & PHASE 27
+
+---
+
+# PHASE 26 — ADVANCED MOTION ENGINE
+
+## Objetivo
+
+Permitir que o sistema produza experiências visuais comparáveis aos melhores sites do:
+
+* Awwwards
+* FWA
+* Refokus
+* Active Theory
+* Obys
+* Locomotive
+* Holographik
+
+---
+
+# Motion Engine
+
+Criar:
+
+```txt
+backend/motion/
+
+motion_agent/
+gsap_agent/
+lenis_agent/
+lottie_agent/
+parallax_agent/
+transition_agent/
+microinteraction_agent/
+```
+
+---
+
+# ThreeJS Engine
+
+Criar:
+
+```txt
+backend/threejs/
+
+threejs_agent/
+r3f_agent/
+shader_agent/
+particles_agent/
+```
+
+---
+
+# Dependency Manager
+
+Criar:
+
+```txt
+backend/dependencies/
+
+dependency_agent/
+package_registry/
+package_validator/
+```
+
+Instalação automática de:
+
+* motion
+* gsap
+* lenis
+* three
+* @react-three/fiber
+* @react-three/drei
+* lottie-react
+
+---
+
+# Animation Dataset
+
+Gerar:
+
+```txt
+animations.json
+
+dependencies.json
+
+motion_metadata.json
+```
+
+---
+
+# Animation Collections
+
+Adicionar ao ChromaDB:
+
+* AnimationPatterns
+* MotionComponents
+* GSAPTimelines
+* ThreeJSScenes
+* Dependencies
+
+---
+
+# PHASE 27 — KNOWLEDGE & DESIGN SYSTEMS ENGINE
+
+## Objetivo
+
+Construir uma base de conhecimento viva inspirada em:
+
+* Aura Assets
+* Aura Skills
+* Aura Design Systems
+
+---
+
+# Asset Engine
+
+Criar:
+
+```txt
+backend/assets/
+
+asset_agent/
+asset_library/
+backgrounds/
+gradients/
+textures/
+3d_assets/
+icons/
+videos/
+```
+
+---
+
+# Skill Engine
+
+Criar:
+
+```txt
+backend/skills/
+
+skill_engine/
+
+luxury_skill/
+saas_skill/
+ai_skill/
+dashboard_skill/
+agency_skill/
+portfolio_skill/
+threejs_skill/
+motion_skill/
+```
+
+---
+
+# Design Systems Engine
+
+Criar:
+
+```txt
+design_systems/
+
+luxury/
+saas/
+portfolio/
+dashboard/
+startup/
+agency/
+minimal/
+glassmorphism/
+```
+
+---
+
+# Component Library
+
+Criar:
+
+```txt
+component_library/
+
+hero/
+navbar/
+cards/
+pricing/
+footer/
+gallery/
+dashboard/
+faq/
+```
+
+---
+
+# Theme Engine
+
+Criar:
+
+```txt
+backend/themes/
+
+theme_agent/
+
+dark_theme/
+light_theme/
+luxury_theme/
+glass_theme/
+minimal_theme/
+```
+
+---
+
+# Knowledge Ingestion Engine
+
+## Objetivo
+
+Detectar automaticamente novos materiais adicionados pelo usuário.
+
+Criar:
+
+```txt
+backend/knowledge/
+
+knowledge_ingestion/
+
+knowledge_builder/
+
+knowledge_scheduler/
+
+knowledge_registry/
+
+knowledge_watchdog/
+```
+
+---
+
+# Pasta monitorada
+
+```txt
+knowledge_input/
+
+assets/
+
+components/
+
+design_systems/
+
+skills/
+
+prompt_templates/
+
+images/
+
+videos/
+
+3d/
+
+references/
+```
+
+---
+
+# Funcionamento
+
+Todos os dias:
+
+09:00
+
+↓
+
+Knowledge Scheduler
+
+↓
+
+Verifica se houve novos arquivos
+
+↓
+
+Se houver
+
+↓
+
+Envia para Knowledge Builder Agent
+
+↓
+
+Extrai conhecimento
+
+↓
+
+Atualiza ChromaDB
+
+↓
+
+Atualiza dataset
+
+↓
+
+Expande biblioteca
+
+---
+
+# Knowledge Builder Agent
+
+Responsabilidades:
+
+* analisar arquivos novos
+* identificar tipo do material
+* gerar metadata
+* gerar embeddings
+* gerar DESIGN.md
+* gerar skill.yaml
+* atualizar component library
+* atualizar assets
+* atualizar themes
+
+---
+
+# Tipos suportados
+
+Imagens
+
+```txt
+png
+jpg
+jpeg
+svg
+webp
+```
+
+Vídeos
+
+```txt
+mp4
+mov
+webm
+```
+
+3D
+
+```txt
+glb
+gltf
+obj
+```
+
+Código
+
+```txt
+tsx
+jsx
+html
+css
+scss
+```
+
+Configurações
+
+```txt
+json
+yaml
+yml
+md
+```
+
+---
+
+# Auto Knowledge Generation
+
+Exemplo:
+
+Usuário adiciona:
+
+```txt
+knowledge_input/
+
+references/
+
+premium_hero.png
+```
+
+↓
+
+Knowledge Builder Agent
+
+↓
+
+Vision Agent
+
+↓
+
+Extrai:
+
+* paleta
+* tipografia
+* layout
+* animações
+
+↓
+
+Gera:
+
+```txt
+design_systems/
+
+luxury/
+
+colors.json
+
+typography.json
+
+spacing.json
+
+motion.json
+
+DESIGN.md
+```
+
+---
+
+# Auto Skill Generation
+
+Se identificar um padrão recorrente:
+
+Gerar:
+
+```txt
+skills/
+
+luxury_skill/
+
+skill.yaml
+```
+
+---
+
+# Auto Component Generation
+
+Se encontrar:
+
+* Hero
+* Footer
+* Cards
+* Pricing
+
+Gerar:
+
+```txt
+component_library/
+
+hero/
+
+hero_0124.tsx
+
+hero_0124_metadata.json
+```
+
+---
+
+# Knowledge Collections
+
+Adicionar ao ChromaDB:
+
+* Assets
+* Skills
+* Themes
+* DesignSystems
+* Components
+* MotionPresets
+* PromptTemplates
+
+---
+
+# Knowledge Watchdog
+
+Criar serviço permanente:
+
+```txt
+backend/knowledge/watchdog/
+```
+
+Responsabilidade:
+
+Monitorar continuamente:
+
+```txt
+knowledge_input/
+```
+
+Quando detectar novos arquivos:
+
+↓
+
+Criar Job Redis
+
+↓
+
+Executar Knowledge Builder Agent
+
+↓
+
+Atualizar ChromaDB
+
+↓
+
+Atualizar Dataset
+
+↓
+
+Atualizar Bibliotecas
+
+---
+
+# Daily Knowledge Scan
+
+Criar Flow no Prefect:
+
+DailyKnowledgeFlow
+
+Executar:
+
+Todo dia às 09:00
+
+Todo dia às 18:00
+
+---
+
+# Pipeline
+
+Knowledge Input
+
+↓
+
+Knowledge Watchdog
+
+↓
+
+Knowledge Builder Agent
+
+↓
+
+Vision Agent
+
+↓
+
+Style Agent
+
+↓
+
+Embedding Agent
+
+↓
+
+ChromaDB
+
+↓
+
+Design System Engine
+
+↓
+
+Skill Engine
+
+↓
+
+Asset Engine
+
+↓
+
+Component Library
+
+↓
+
+Dataset cresce continuamente
+
+---
+
+# Objetivo Final
+
+O usuário poderá simplesmente copiar arquivos para:
+
+```txt
+knowledge_input/
+```
+
+e o sistema estudará automaticamente tudo o que foi adicionado, transformando os materiais em conhecimento reutilizável, expandindo continuamente a inteligência da plataforma sem necessidade de intervenção manual.
+
+
+# Masterpiece Engine ⭐
+
+## Objetivo
+
+Permitir que determinados sites, templates e designs sejam promovidos para a categoria especial de **MASTERPIECE** ou **GOLDEN_REFERENCE**, recebendo um nível de análise muito mais profundo do que os sites normais do dataset.
+
+Esses designs passam a ser considerados referências de altíssimo valor e terão maior influência nas buscas RAG e na geração de novos projetos.
+
+---
+
+# Estrutura
+
+Criar:
+
+```txt
+backend/masterpieces/
+
+masterpiece_agent/
+masterpiece_registry/
+masterpiece_builder/
+masterpiece_embeddings/
+masterpiece_validator/
+masterpiece_library/
+```
+
+---
+
+# Registro de Masterpieces
+
+Criar:
+
+```txt
+masterpieces/
+
+elara/
+noirframe/
+linear/
+stripe/
+vercel/
+refokus/
+obys/
+active_theory/
+```
+
+---
+
+# masterpiece.yaml
+
+Exemplo:
+
+```yaml
+name: Elara Footwear
+
+priority: masterpiece
+
+category:
+  - fashion
+  - luxury
+  - ecommerce
+
+analyze_depth: maximum
+
+generate:
+
+  - design_system
+  - skills
+  - assets
+  - components
+  - animations
+  - dependencies
+  - prompt_templates
+  - themes
+  - typography
+  - color_palettes
+
+weight: 10
+```
+
+---
+
+# Masterpiece Collections
+
+Adicionar ao ChromaDB:
+
+```txt
+Masterpieces
+
+MasterpieceComponents
+
+MasterpieceAnimations
+
+MasterpieceAssets
+
+MasterpieceDesignSystems
+
+GoldenReferences
+```
+
+---
+
+# Weight System
+
+Componentes normais:
+
+```txt
+weight = 1
+```
+
+Componentes provenientes de Masterpieces:
+
+```txt
+weight = 10
+```
+
+A busca semântica deverá priorizar referências oriundas dos Masterpieces.
+
+---
+
+# Masterpiece Builder Agent
+
+Quando um site for promovido para MASTERPIECE, executar:
+
+```txt
+URL
+
+↓
+
+Playwright
+
+↓
+
+Screenshots
+
+↓
+
+HTML
+
+↓
+
+Vision Agent
+
+↓
+
+Style Agent
+
+↓
+
+Animation Agent
+
+↓
+
+Typography Agent
+
+↓
+
+Color Agent
+
+↓
+
+Asset Agent
+
+↓
+
+Theme Agent
+
+↓
+
+Knowledge Builder Agent
+
+↓
+
+Masterpiece Builder Agent
+
+↓
+
+ChromaDB
+```
+
+---
+
+# Estrutura Gerada
+
+Cada Masterpiece deverá produzir:
+
+```txt
+masterpieces/
+
+elara/
+
+DESIGN.md
+
+skill.yaml
+
+colors.json
+
+typography.json
+
+motion.json
+
+theme.json
+
+assets/
+
+components/
+
+animations/
+
+prompts/
+
+embeddings/
+```
+
+---
+
+# Masterpiece Tags
+
+Exemplo:
+
+```json
+{
+  "masterpiece": true,
+  "priority": 10,
+  "style": [
+    "luxury",
+    "editorial",
+    "fashion"
+  ]
+}
+```
+
+---
+
+# Prompt Templates
+
+Gerar:
+
+```txt
+prompt_templates/
+
+elara.md
+
+noirframe.md
+
+linear.md
+
+stripe.md
+
+refokus.md
+```
+
+---
+
+# Super Skills
+
+Gerar automaticamente:
+
+```txt
+skills/
+
+elara_skill/
+
+noirframe_skill/
+
+linear_skill/
+
+stripe_skill/
+
+refokus_skill/
+```
+
+---
+
+# Masterpiece Dashboard
+
+Adicionar ao frontend:
+
+```txt
+Masterpieces
+
+⭐ Elara Footwear
+
+⭐ NoirFrame Fashion
+
+⭐ Linear
+
+⭐ Stripe
+
+⭐ Vercel
+
+⭐ Refokus
+```
+
+Permitir:
+
+```txt
+Promote to Masterpiece
+
+Demote from Masterpiece
+```
+
+---
+
+# Masterpiece Score
+
+Cada referência deverá receber uma pontuação baseada em:
+
+* Visual Quality
+* Typography
+* Spacing
+* Motion
+* Components
+* Color Harmony
+* Accessibility
+* Performance
+* Responsiveness
+
+Exemplo:
+
+```txt
+Overall Score: 98.4
+```
+
+---
+
+# Manual Promotion
+
+O usuário poderá executar:
+
+```txt
+Analyze as MASTERPIECE:
+
+https://www.aura.build/templates/elara-footwear
+```
+
+ou
+
+```txt
+Promote to MASTERPIECE:
+
+https://noirframefashion.aura.build/
+```
+
+---
+
+# Objetivo Final
+
+Construir uma coleção de referências premium capazes de servir como os principais "professores" do sistema.
+
+Os Masterpieces terão prioridade sobre o restante do dataset e serão responsáveis por fornecer:
+
+* Design Systems de alta qualidade;
+* Skills avançadas;
+* Motion Patterns;
+* Assets premium;
+* Componentes reutilizáveis;
+* Prompt Templates especializados;
+* Conhecimento de nível Awwwards.
+
+Com o passar do tempo, os Masterpieces se tornarão o núcleo de conhecimento mais valioso de toda a plataforma.
