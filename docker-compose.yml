@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ui-ai-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ui_ai_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ui-ai-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ui-ai-redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ui-ai-network
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: ui-ai-chromadb
+    restart: always
+    ports:
+      - "${CHROMADB_PORT:-8000}:8000"
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+    volumes:
+      - chromadb_data:/chroma/chroma
+    networks:
+      - ui-ai-network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: ui-ai-api
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-ui_ai_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app
+      - ./storage:/app/storage
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - chromadb
+    networks:
+      - ui-ai-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: ui-ai-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - ui-ai-network
+
+  workers:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: ui-ai-workers
+    command: python -m workers.worker
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-ui_ai_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./backend:/app
+      - ./storage:/app/storage
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - chromadb
+    networks:
+      - ui-ai-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  chromadb_data:
+
+networks:
+  ui-ai-network:
+    driver: bridge
