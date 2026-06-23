@@ -204,7 +204,7 @@ def index_vectors_task(site_dir: str) -> Dict[str, Any]:
 
 @flow(name="generation-pipeline-flow")
 def generation_pipeline_flow(url: str, target_framework: str = "React", project_id: int = 1) -> Dict[str, Any]:
-    """Prefect orchestration workflow pipeline for the UI AI ecosystem."""
+    """Prefect orchestration workflow pipeline for Helix UI."""
     base_dir = Path(__file__).resolve().parent.parent.parent
     output_dir = str(base_dir / "storage" / "prefect_run")
     os.makedirs(output_dir, exist_ok=True)

@@ -10,7 +10,7 @@ logger = setup_logger("api.main")
 
 # Initialize FastAPI application
 app = FastAPI(
-    title="UI AI Ecosystem API",
+    title="Helix UI API",
     description="Backend API for crawling, pattern analysis, and RAG React-Tailwind code generation.",
     version="1.0.0"
 )

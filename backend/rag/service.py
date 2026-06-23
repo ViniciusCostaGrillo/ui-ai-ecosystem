@@ -125,7 +125,7 @@ class RAGService:
             )
         context_str = "\n\n".join(context_parts)
 
-        prompt = f"""You are a principal designer and frontend engineer for the UI AI Ecosystem.
+        prompt = f"""You are a principal designer and frontend engineer for Helix UI.
 The user has provided the following prompt:
 "{user_prompt}"
 

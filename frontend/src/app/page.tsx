@@ -49,10 +49,10 @@ export default function DashboardHome() {
           {/* Logo brand branding */}
           <div className="flex items-center gap-3 mb-8">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-400 to-teal-500 flex items-center justify-center font-extrabold text-black text-xl shadow-md shadow-emerald-500/10">
-              U
+              H
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight text-white block">UI AI ECOSYSTEM</span>
+              <span className="text-lg font-bold tracking-tight text-white block">HELIX UI</span>
               <span className="text-[9px] font-bold text-zinc-550 uppercase tracking-widest block mt-0.5">Automated Builder</span>
             </div>
           </div>

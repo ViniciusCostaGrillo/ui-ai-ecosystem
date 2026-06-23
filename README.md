@@ -1,17 +1,17 @@
 <div align="center">
 
-# 🌌 UI AI Ecosystem
+# 🌌 Helix UI
 ### *Autonomous Interface Engineering Engine*
 
 🤖 **Learn Continually. Synthesize Dynamically. Render Flawlessly.**
 
 ---
 
-[![GitHub Version](https://img.shields.io/badge/version-1.0.0-emerald?style=for-the-badge&logo=github)](https://github.com/ViniciusCostaGrillo/ui-ai-ecosystem)
+[![GitHub Version](https://img.shields.io/badge/version-1.0.0-emerald?style=for-the-badge&logo=github)](https://github.com/ViniciusCostaGrillo/helix-ui)
 [![License](https://img.shields.io/badge/license-MIT-emerald?style=for-the-badge)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/ViniciusCostaGrillo/ui-ai-ecosystem?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/ui-ai-ecosystem/stargazers)
-[![Last Commit](https://img.shields.io/github/last-commit/ViniciusCostaGrillo/ui-ai-ecosystem?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/ui-ai-ecosystem/commits/master)
-[![Issues Open](https://img.shields.io/github/issues/ViniciusCostaGrillo/ui-ai-ecosystem?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/ui-ai-ecosystem/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/ViniciusCostaGrillo/helix-ui?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/helix-ui/stargazers)
+[![Last Commit](https://img.shields.io/github/last-commit/helix-ui?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/helix-ui/commits/master)
+[![Issues Open](https://img.shields.io/github/issues/helix-ui?style=for-the-badge&color=emerald)](https://github.com/ViniciusCostaGrillo/helix-ui/issues)
 
 [![Docker Support](https://img.shields.io/badge/docker-ready-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
 [![Python v3.12](https://img.shields.io/badge/python-3.12-blue?style=for-the-badge&logo=python)](https://www.python.org/)
@@ -43,9 +43,9 @@
 
 ## 🌌 About the Project
 
-**UI AI Ecosystem** is an autonomous interface engineering platform that continually crawls premium websites, extracts their underlying visual genetics, and dynamically synthesizes production-ready React + Tailwind CSS components. 
+**Helix UI** is an autonomous interface engineering platform that continually crawls premium websites, extracts their underlying visual genetics, and dynamically synthesizes production-ready React + Tailwind CSS components. 
 
-Unlike traditional generators that produce static, isolated blocks, the UI AI Ecosystem uses **Multi-Agent Orchestration (LangGraph & PydanticAI)**, **Retrieval-Augmented Generation (RAG)**, and **Computer Vision heuristics** to catalog design tokens, GSAP timelines, and Three.js configurations. 
+Unlike traditional generators that produce static, isolated blocks, Helix UI uses **Multi-Agent Orchestration (LangGraph & PydanticAI)**, **Retrieval-Augmented Generation (RAG)**, and **Computer Vision heuristics** to catalog design tokens, GSAP timelines, and Three.js configurations. 
 
 Our long-term vision is to establish an autonomous, self-improving design engine capable of generating interactive experiences worthy of the **Awwwards** directly from natural language prompts.
 
@@ -134,7 +134,7 @@ graph TD
 ## 📁 Folder Structure
 
 ```text
-ui-ai-ecosystem/
+helix-ui/
 ├── backend/                    # Python FastAPI Backend Services
 │   ├── agents/                 # Multi-agent engines (LangGraph, PydanticAI, Agno)
 │   ├── analyzer/               # LLM layout analytics & prompt synthesizers
@@ -337,7 +337,7 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more details.
 
 <div align="center">
 
-**Built with 🌌 by the UI AI Ecosystem Community.**
+**Built with 🌌 by the Helix UI Community.**
 
 [Vercel](https://vercel.com) • [OpenAI](https://openai.com) • [Supabase](https://supabase.com) • [LangChain](https://langchain.com)
 
