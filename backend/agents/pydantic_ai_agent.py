@@ -31,8 +31,10 @@ class PydanticAIAgent:
             gemini_key = None
 
         if openai_key:
-            logger.info("PydanticAI: Using OpenAIModel (gpt-4o-mini)")
-            return OpenAIModel("gpt-4o-mini")
+            model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini")
+            base_url = os.getenv("OPENAI_API_BASE")
+            logger.info(f"PydanticAI: Using OpenAIModel ({model_name})")
+            return OpenAIModel(model_name, base_url=base_url, api_key=openai_key)
         elif gemini_key:
             logger.info("PydanticAI: Using GeminiModel (gemini-1.5-flash)")
             return GeminiModel("gemini-1.5-flash")

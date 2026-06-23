@@ -114,21 +114,42 @@ You must generate a structured JSON document representing the design tokens, col
 
     def _call_openai(self, prompt: str, api_key: str) -> AnalysisResult:
         from openai import OpenAI
+        import json
 
-        client = OpenAI(api_key=api_key)
+        base_url = os.getenv("OPENAI_API_BASE")
+        model = os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini")
+        client = OpenAI(api_key=api_key, base_url=base_url)
         try:
-            response = client.beta.chat.completions.parse(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a structural layout analyzer that returns precise Pydantic outputs.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                response_format=AnalysisResult,
-            )
-            parsed_result = response.choices[0].message.parsed
+            if "gpt-4o" in model:
+                response = client.beta.chat.completions.parse(
+                    model=model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a structural layout analyzer that returns precise Pydantic outputs.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    response_format=AnalysisResult,
+                )
+                parsed_result = response.choices[0].message.parsed
+            else:
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a structural layout analyzer that returns precise JSON matching the AnalysisResult schema.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    response_format={"type": "json_object"},
+                )
+                raw_content = response.choices[0].message.content
+                if not raw_content:
+                    raise ValueError("Received empty response from local model.")
+                parsed_result = AnalysisResult(**json.loads(raw_content))
+
             if not parsed_result:
                 raise ValueError("OpenAI parse returned empty payload.")
             return parsed_result

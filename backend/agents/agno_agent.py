@@ -34,8 +34,10 @@ class AgnoAgent:
 
         if not self.is_mock:
             logger.info("Agno: Initializing Agent with OpenAI model and tools.")
+            model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini")
+            base_url = os.getenv("OPENAI_API_BASE")
             self.agent = Agent(
-                model=OpenAIChat(id="gpt-4o-mini", api_key=openai_key),
+                model=OpenAIChat(id=model_name, api_key=openai_key, base_url=base_url),
                 tools=self.tools,
                 instructions=["You are a layout assistant that validates structures using tool hooks."],
                 markdown=True

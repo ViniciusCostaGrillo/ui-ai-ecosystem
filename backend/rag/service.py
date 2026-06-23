@@ -167,10 +167,12 @@ Instructions:
     ) -> RAGQueryResponse:
         from openai import OpenAI
 
-        client = OpenAI(api_key=api_key)
+        base_url = os.getenv("OPENAI_API_BASE")
+        model = os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini")
+        client = OpenAI(api_key=api_key, base_url=base_url)
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=model,
                 messages=[
                     {"role": "system", "content": "You are a helpful RAG developer assistant."},
                     {"role": "user", "content": prompt}
@@ -180,7 +182,7 @@ Instructions:
                 prompt=original_prompt,
                 answer=response.choices[0].message.content,
                 retrieved_contexts=retrieved,
-                metadata={"provider": "openai", "model": "gpt-4o-mini"}
+                metadata={"provider": "openai", "model": model}
             )
         except Exception as e:
             logger.error(f"OpenAI RAG query failed: {e}")
