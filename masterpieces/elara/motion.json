@@ -1,0 +1,9 @@
+{
+  "gsap": [
+    "TimelineLite",
+    "ScrollTrigger"
+  ],
+  "presets": {
+    "reveal": "stagger_reveal"
+  }
+}

@@ -1,0 +1,9 @@
+category:
+- luxury
+- editorial
+description: Custom layout synthesis parameters learned from Test Boutique.
+name: test_boutique_skill
+rules:
+- Prioritize visual layouts emphasizing luxury, editorial features.
+- Combine fonts Lora, Inter for headline-body pairings.
+- Inject smooth Lenis scrolling animations.

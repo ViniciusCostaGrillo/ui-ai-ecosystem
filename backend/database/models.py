@@ -133,3 +133,18 @@ class TrainingHistory(Base):
     loss = Column(Float, nullable=True)
     status = Column(String(50), nullable=False, default="running", index=True)  # running, completed, failed
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Masterpiece(Base):
+    __tablename__ = "masterpieces"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String(255), nullable=False)
+    url = Column(String(1024), nullable=False, index=True)
+    category = Column(JSON, nullable=True)  # e.g., ["fashion", "luxury"]
+    score = Column(Float, nullable=True, default=90.0)
+    weight = Column(Integer, nullable=False, default=10)
+    status = Column(String(50), nullable=False, default="active")  # active, analyzing
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
