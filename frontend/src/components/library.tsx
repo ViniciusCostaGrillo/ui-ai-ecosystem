@@ -21,7 +21,8 @@ import {
   Trash2,
   RefreshCw,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Loader2
 } from "lucide-react";
 
 interface MonitoredFile {
@@ -162,6 +163,44 @@ export default function LibraryView() {
 
     return () => clearInterval(interval);
   }, [apiBaseUrl]);
+
+  const [uploadingBatch, setUploadingBatch] = useState(false);
+
+  const handleBatchUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingBatch(true);
+    addLog(`[SYSTEM] Lendo arquivo de lote: ${file.name}`);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${apiBaseUrl}/importer/upload?promote_to_masterpiece=true&category=saas`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        addLog(`[SYSTEM] Upload de lote bem-sucedido! ${data.jobs_queued} tarefas enfileiradas.`);
+        alert(`Sucesso! ${data.jobs_queued} links foram enviados para a fila de extração em lote.`);
+        fetchStatsAndHistory();
+        fetchQueue();
+      } else {
+        const errData = await res.json();
+        addLog(`[SYSTEM] Falha no upload de lote: ${errData.detail || "Erro desconhecido"}`);
+        alert(`Erro ao processar lote: ${errData.detail || "Verifique o formato do arquivo."}`);
+      }
+    } catch (err: any) {
+      addLog(`[SYSTEM] Erro de rede ao fazer upload de lote: ${err.message}`);
+      alert(`Erro de conexão ao enviar lote: ${err.message}`);
+    } finally {
+      setUploadingBatch(false);
+      e.target.value = "";
+    }
+  };
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -546,6 +585,38 @@ export default function LibraryView() {
             <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-500 animate-pulse" /> Tarefas Ativas de Ingestão
             </h4>
+
+            {/* Batch Import Zone */}
+            <div className="bg-zinc-900/40 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h5 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                  <FolderUp className="w-4 h-4 text-emerald-500" /> Ingestão em Lote (.txt)
+                </h5>
+                <p className="text-[10px] text-zinc-550 font-mono mt-1">
+                  Selecione um arquivo de texto (.txt) contendo um link por linha para processar em massa.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <label className={`flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-800 border border-zinc-700 hover:border-emerald-500 hover:text-emerald-400 text-[10px] font-bold font-mono uppercase cursor-pointer transition-all duration-200 ${uploadingBatch ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {uploadingBatch ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" /> Processando...
+                    </>
+                  ) : (
+                    <>
+                      <FolderUp className="w-3.5 h-3.5 text-zinc-400" /> Carregar Arquivo
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept=".txt"
+                    className="hidden"
+                    disabled={uploadingBatch}
+                    onChange={handleBatchUpload}
+                  />
+                </label>
+              </div>
+            </div>
 
             {queueJobs.length === 0 ? (
               <div className="py-12 border border-dashed border-zinc-800/80 rounded-xl text-center text-zinc-550 text-xs font-sans">
