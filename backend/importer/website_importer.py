@@ -1,9 +1,10 @@
 import os
 import time
+import shutil
 import logging
 import asyncio
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 
 from backend.importer.queue_manager import QueueManager
@@ -28,6 +29,62 @@ class WebsiteImporter:
         self.base_dir = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
+        self.knowledge_input_dir = os.path.join(self.base_dir, "knowledge_input")
+
+    def _export_to_knowledge_input(
+        self,
+        domain_name: str,
+        screenshot_path: Optional[str] = None,
+        html_path: Optional[str] = None,
+        css_path: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> None:
+        """Exports crawl artefacts into the correct knowledge_input/ subfolders.
+
+        Mapping:
+          screenshot  -> knowledge_input/images/<domain>/
+          HTML file   -> knowledge_input/references/<domain>/
+          CSS file    -> knowledge_input/design_systems/<domain>/
+          metadata    -> knowledge_input/references/<domain>/metadata.txt
+        """
+        try:
+            # --- images ---
+            if screenshot_path and os.path.isfile(screenshot_path):
+                dest_dir = os.path.join(self.knowledge_input_dir, "images", domain_name)
+                os.makedirs(dest_dir, exist_ok=True)
+                dest_path = os.path.join(dest_dir, os.path.basename(screenshot_path))
+                shutil.copy2(screenshot_path, dest_path)
+                logger.info(f"KnowledgeExport: screenshot -> {os.path.relpath(dest_path, self.base_dir)}")
+
+            # --- references (HTML) ---
+            if html_path and os.path.isfile(html_path):
+                dest_dir = os.path.join(self.knowledge_input_dir, "references", domain_name)
+                os.makedirs(dest_dir, exist_ok=True)
+                dest_path = os.path.join(dest_dir, os.path.basename(html_path))
+                shutil.copy2(html_path, dest_path)
+                logger.info(f"KnowledgeExport: html -> {os.path.relpath(dest_path, self.base_dir)}")
+
+            # --- design_systems (CSS) ---
+            if css_path and os.path.isfile(css_path):
+                dest_dir = os.path.join(self.knowledge_input_dir, "design_systems", domain_name)
+                os.makedirs(dest_dir, exist_ok=True)
+                dest_path = os.path.join(dest_dir, os.path.basename(css_path))
+                shutil.copy2(css_path, dest_path)
+                logger.info(f"KnowledgeExport: css -> {os.path.relpath(dest_path, self.base_dir)}")
+
+            # --- metadata text reference ---
+            if metadata:
+                dest_dir = os.path.join(self.knowledge_input_dir, "references", domain_name)
+                os.makedirs(dest_dir, exist_ok=True)
+                meta_path = os.path.join(dest_dir, "metadata.txt")
+                with open(meta_path, "w", encoding="utf-8") as f:
+                    f.write(f"Domain: {domain_name}\n")
+                    for key, value in metadata.items():
+                        f.write(f"{key}: {value}\n")
+                logger.info(f"KnowledgeExport: metadata.txt -> {os.path.relpath(meta_path, self.base_dir)}")
+
+        except Exception as export_err:
+            logger.warning(f"KnowledgeExport: Non-critical export failure for '{domain_name}': {export_err}")
 
     def import_website_sync(
         self,
@@ -154,6 +211,18 @@ class WebsiteImporter:
                     }
                 )
 
+            # 6. Export artefacts to knowledge_input/ so they appear in Arquivos Monitorados
+            logger.info("WebsiteImporter: Exporting artefacts to knowledge_input/...")
+            # Resolve CSS path from crawled output dir if it exists
+            css_file_path = os.path.join(crawled_output_dir, "style.css")
+            self._export_to_knowledge_input(
+                domain_name=domain_name,
+                screenshot_path=screenshot_path,
+                html_path=html_path,
+                css_path=css_file_path if os.path.isfile(css_file_path) else None,
+                metadata=dataset.metadata_json
+            )
+
             self.queue.update_job(job_id, {
                 "status": "completed",
                 "progress": 100,
@@ -242,6 +311,13 @@ class WebsiteImporter:
                             "responsiveness": 94.0
                         }
                     )
+
+                # Export fallback reference metadata to knowledge_input/ so the
+                # "Arquivos Monitorados" tab is populated even without a real crawl
+                self._export_to_knowledge_input(
+                    domain_name=domain_name,
+                    metadata=dataset.metadata_json
+                )
 
                 self.queue.update_job(job_id, {
                     "status": "completed",

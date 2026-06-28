@@ -114,20 +114,21 @@ async def list_knowledge_files() -> Dict[str, List[Dict[str, Any]]]:
     for category in grouped_files.keys():
         dir_path = os.path.join(INPUT_ROOT, category)
         if os.path.exists(dir_path):
-            for file_name in os.listdir(dir_path):
-                if file_name.startswith(".") or file_name == ".gitkeep":
-                    continue
-                file_path = os.path.join(dir_path, file_name)
-                stats = os.stat(file_path)
-                grouped_files[category].append(
-                    {
-                        "name": file_name,
-                        "size": stats.st_size,
-                        "modified": stats.st_mtime,
-                        "relative_path": os.path.relpath(file_path, BASE_DIR).replace(
-                            "\\", "/"
-                        ),
-                    }
-                )
+            for root, _, files in os.walk(dir_path):
+                for file_name in files:
+                    if file_name.startswith(".") or file_name == ".gitkeep":
+                        continue
+                    file_path = os.path.join(root, file_name)
+                    stats = os.stat(file_path)
+                    grouped_files[category].append(
+                        {
+                            "name": file_name,
+                            "size": stats.st_size,
+                            "modified": stats.st_mtime,
+                            "relative_path": os.path.relpath(file_path, BASE_DIR).replace(
+                                "\\", "/"
+                            ),
+                        }
+                    )
 
     return grouped_files
