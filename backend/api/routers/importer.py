@@ -72,12 +72,21 @@ async def upload_import_file(
             detail="No valid URLs found in the uploaded file."
         )
 
-    # Validate URLs and check for duplicates in DB
+    # Validate URLs and check for duplicates in DB in bulk
+    urls_to_validate = [rec["url"] for rec in records]
+    validation_results = validator.validate_bulk(db, urls_to_validate)
+    
     validated_records = []
+    skipped_duplicates = 0
+    
     for rec in records:
-        is_valid, reason = validator.validate(db, rec["url"])
+        url = rec["url"]
+        is_valid, reason = validation_results.get(url, (False, "Unknown error"))
         if is_valid:
-            validated_records.append(rec)
+            if reason == "duplicate":
+                skipped_duplicates += 1
+            else:
+                validated_records.append(rec)
 
     options = {
         "promote_to_masterpiece": promote_to_masterpiece,
@@ -89,8 +98,12 @@ async def upload_import_file(
 
     job_ids = batch_processor.enqueue_batch(validated_records, options)
     
+    message = f"Successfully parsed and queued {len(job_ids)} import jobs."
+    if skipped_duplicates > 0:
+        message += f" Skipped {skipped_duplicates} duplicate URLs already present in the database."
+    
     return {
-        "message": f"Successfully parsed and queued {len(job_ids)} import jobs.",
+        "message": message,
         "jobs_queued": len(job_ids),
         "job_ids": job_ids
     }

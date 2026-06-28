@@ -2,8 +2,8 @@ import os
 import logging
 from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
-from pydantic_ai.models.openai import OpenAIModel
-from pydantic_ai.models.gemini import GeminiModel
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.models.google import GoogleModel
 
 from backend.schemas.agents import AgentMessage, AgentRunContext, AgentRunResult
 
@@ -33,12 +33,12 @@ class PydanticAIAgent:
         if openai_key:
             model_name = os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini")
             base_url = os.getenv("OPENAI_API_BASE")
-            logger.info(f"PydanticAI: Using OpenAIModel ({model_name})")
-            return OpenAIModel(model_name, base_url=base_url, api_key=openai_key)
+            logger.info(f"PydanticAI: Using OpenAIChatModel ({model_name})")
+            return OpenAIChatModel(model_name, base_url=base_url, api_key=openai_key)
         elif gemini_key:
             model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-pro")
-            logger.info(f"PydanticAI: Using GeminiModel ({model_name})")
-            return GeminiModel(model_name)
+            logger.info(f"PydanticAI: Using GoogleModel ({model_name})")
+            return GoogleModel(model_name)
         else:
             logger.warning("PydanticAI: No valid API keys found. Falling back to TestModel (Mock).")
             return TestModel()

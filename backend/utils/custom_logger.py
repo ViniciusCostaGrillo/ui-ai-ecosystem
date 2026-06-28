@@ -2,7 +2,7 @@ import logging
 import os
 
 # Read log level from environment
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").strip().upper()
 
 
 class DatabaseLoggingHandler(logging.Handler):
@@ -16,6 +16,7 @@ class DatabaseLoggingHandler(logging.Handler):
         self.session_maker = session_maker
 
     def emit(self, record: logging.LogRecord) -> None:
+        db = None
         try:
             log_message = self.format(record)
             
@@ -34,10 +35,12 @@ class DatabaseLoggingHandler(logging.Handler):
             )
             db.add(db_log)
             db.commit()
-            db.close()
         except Exception:
             # Prevent logging errors from crashing the main application flow
             pass
+        finally:
+            if db is not None:
+                db.close()
 
 
 def setup_logger(name: str) -> logging.Logger:

@@ -25,24 +25,26 @@ class PlaywrightEngine(BaseCrawlerEngine):
             async with async_playwright() as p:
                 # Launch headless browser
                 browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
+                try:
+                    page = await browser.new_page()
 
-                # Set viewport size
-                await page.set_viewport_size({"width": 1280, "height": 800})
+                    # Set viewport size
+                    await page.set_viewport_size({"width": 1280, "height": 800})
 
-                # Navigate and wait for network activity to settle
-                await page.goto(url, wait_until="networkidle", timeout=30000)
+                    # Navigate and wait for network activity to settle
+                    await page.goto(url, wait_until="networkidle", timeout=30000)
 
-                # Capture full-page screenshot
-                await page.screenshot(path=screenshot_path, full_page=True)
+                    # Capture full-page screenshot
+                    await page.screenshot(path=screenshot_path, full_page=True)
 
-                # Capture HTML page content
-                html_content = await page.content()
-                with open(html_path, "w", encoding="utf-8") as f:
-                    f.write(html_content)
+                    # Capture HTML page content
+                    html_content = await page.content()
+                    with open(html_path, "w", encoding="utf-8") as f:
+                        f.write(html_content)
 
-                title = await page.title()
-                await browser.close()
+                    title = await page.title()
+                finally:
+                    await browser.close()
 
             metadata = {
                 "title": title,

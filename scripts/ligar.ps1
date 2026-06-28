@@ -5,19 +5,19 @@ if ($target -ne "Helix") {
 }
 
 # Garante que o script roda no diretorio raiz do projeto
-Set-Location -Path "c:\Users\Vinic\UI IA BUILDER"
+Set-Location -Path "c:\Users\Vinicius C Grillo\Helix UI\Helix-LLM-UI"
 
 Write-Host "[Helix] Iniciando o backend da API..." -ForegroundColor Yellow
-Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinic\UI IA BUILDER`" && set DATABASE_URL=sqlite:///./test.db&& set PYTHONPATH=.&& .venv\Scripts\python.exe -m uvicorn backend.api.main:app --port 8000" -WindowStyle Minimized
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinicius C Grillo\Helix UI\Helix-LLM-UI`" && set PYTHONPATH=.&& .venv\Scripts\python.exe -m uvicorn backend.api.main:app --port 8000" -WindowStyle Minimized
 
 Write-Host "[Helix] Iniciando o Watchdog de conhecimento..." -ForegroundColor Yellow
-Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinic\UI IA BUILDER`" && set DATABASE_URL=sqlite:///./test.db&& set PYTHONPATH=.&& .venv\Scripts\python.exe scripts\run_watchdog.py" -WindowStyle Minimized
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinicius C Grillo\Helix UI\Helix-LLM-UI`" && set PYTHONPATH=.&& .venv\Scripts\python.exe scripts\run_watchdog.py" -WindowStyle Minimized
 
 Write-Host "[Helix] Aguardando o backend estar totalmente pronto..." -ForegroundColor Yellow
-& .\.venv\Scripts\python.exe scripts\wait_for_port.py 8000
+& "c:\Users\Vinicius C Grillo\Helix UI\Helix-LLM-UI\.venv\Scripts\python.exe" scripts\wait_for_port.py 8000
 
 Write-Host "[Helix] Iniciando o frontend Next.js..." -ForegroundColor Yellow
-Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinic\UI IA BUILDER\frontend`" && npm run dev" -WindowStyle Minimized
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d `"c:\Users\Vinicius C Grillo\Helix UI\Helix-LLM-UI\frontend`" && npm run dev" -WindowStyle Minimized
 
 Write-Host "==========================================" -ForegroundColor Green
 Write-Host "Helix UI foi iniciado em segundo plano!" -ForegroundColor Green

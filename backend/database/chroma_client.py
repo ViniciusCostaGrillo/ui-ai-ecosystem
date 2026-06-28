@@ -1,4 +1,5 @@
 import os
+import socket
 from typing import Any, Dict, List
 import chromadb
 from chromadb.config import Settings
@@ -6,6 +7,15 @@ from backend.schemas.chromadb import ChromaQueryResponse, ChromaResultItem
 from backend.utils.custom_logger import setup_logger
 
 logger = setup_logger("database.chroma_client")
+
+
+def _is_host_reachable(host: str, port: int, timeout: float = 1.5) -> bool:
+    """Fast TCP probe to check if host:port is reachable before attempting ChromaDB connection."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except (socket.timeout, ConnectionRefusedError, OSError):
+        return False
 
 # Global singleton connection cache
 _cached_chroma_client = None
@@ -25,35 +35,43 @@ class ChromaClientManager:
 
         host = os.getenv("CHROMADB_HOST", "localhost")
         port = int(os.getenv("CHROMADB_PORT", "8000"))
-        
-        # Try connecting to the HTTP client (standard for Docker setup)
-        try:
-            logger.info(f"Attempting connection to ChromaDB server at http://{host}:{port}...")
-            self.client = chromadb.HttpClient(
-                host=host,
-                port=port,
-                settings=Settings(allow_reset=True)
+
+        # Fast TCP probe (1.5s timeout) before attempting full HTTP connection
+        if _is_host_reachable(host, port):
+            try:
+                logger.info(f"Attempting connection to ChromaDB server at http://{host}:{port}...")
+                self.client = chromadb.HttpClient(
+                    host=host,
+                    port=port,
+                    settings=Settings(allow_reset=True)
+                )
+                # Test connection by listing collections
+                self.client.list_collections()
+                logger.info("Connected to ChromaDB server successfully.")
+                _cached_chroma_client = self.client
+                return
+            except Exception as e:
+                logger.warning(
+                    f"Failed to connect to ChromaDB server: {e}. "
+                    "Falling back to local persistent on-disk storage..."
+                )
+        else:
+            logger.info(
+                f"ChromaDB server not reachable at {host}:{port}. "
+                "Using local persistent on-disk storage..."
             )
-            # Test connection by listing collections
-            self.client.list_collections()
-            logger.info("Connected to ChromaDB server successfully.")
-            _cached_chroma_client = self.client
-        except Exception as e:
-            logger.warning(
-                f"Failed to connect to ChromaDB server: {e}. "
-                "Falling back to local persistent on-disk storage..."
-            )
-            # Fall back to local persistent client
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            db_path = os.path.join(base_dir, "storage", "chromadb")
-            os.makedirs(db_path, exist_ok=True)
-            
-            self.client = chromadb.PersistentClient(
-                path=db_path,
-                settings=Settings(allow_reset=True)
-            )
-            logger.info(f"Initialized local ChromaDB PersistentClient at: {db_path}")
-            _cached_chroma_client = self.client
+
+        # Fall back to local persistent client
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        db_path = os.path.join(base_dir, "storage", "chromadb")
+        os.makedirs(db_path, exist_ok=True)
+
+        self.client = chromadb.PersistentClient(
+            path=db_path,
+            settings=Settings(allow_reset=True)
+        )
+        logger.info(f"Initialized local ChromaDB PersistentClient at: {db_path}")
+        _cached_chroma_client = self.client
 
     def get_or_create_collection(self, collection_name: str) -> Any:
         """Retrieves or initializes a vector collection by name."""

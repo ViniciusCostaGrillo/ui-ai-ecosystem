@@ -121,8 +121,7 @@ class WebsiteImporter:
                 }
             )
             db.add(dataset)
-            db.commit()
-            db.refresh(dataset)
+            db.flush()  # Populate dataset.id without committing transaction yet
 
             # Record crawler history
             history = CrawlerHistory(
@@ -131,7 +130,7 @@ class WebsiteImporter:
                 dataset_id=dataset.id
             )
             db.add(history)
-            db.commit()
+            db.commit()  # Commit both Dataset and CrawlerHistory together
 
             # 5. Auto Promote to Masterpiece if requested
             is_promoted = options.get("promote_to_masterpiece", False)
@@ -215,8 +214,7 @@ class WebsiteImporter:
                     }
                 )
                 db.add(dataset)
-                db.commit()
-                db.refresh(dataset)
+                db.flush()  # Populate dataset.id without committing transaction yet
 
                 # Record crawler history
                 history = CrawlerHistory(
@@ -225,7 +223,7 @@ class WebsiteImporter:
                     dataset_id=dataset.id
                 )
                 db.add(history)
-                db.commit()
+                db.commit()  # Commit both Dataset and CrawlerHistory together
 
                 # 4. Optional masterpiece promotion in fallback
                 is_promoted = options.get("promote_to_masterpiece", False)

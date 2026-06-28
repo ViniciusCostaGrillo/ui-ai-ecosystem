@@ -3,6 +3,7 @@ import csv
 import logging
 import threading
 from typing import List, Dict, Any
+from concurrent.futures import ThreadPoolExecutor
 from sqlalchemy.orm import Session
 from backend.database.session import SessionLocal
 from backend.importer.queue_manager import QueueManager
@@ -15,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 class BatchProcessor:
     """Processes lists of URLs uploaded via files and schedules them for import."""
+
+    # Class-level executor to limit concurrency of crawls across all batches
+    _executor = ThreadPoolExecutor(max_workers=2)
 
     def __init__(self) -> None:
         self.queue = QueueManager()
@@ -107,13 +111,14 @@ class BatchProcessor:
             job_id = job["id"]
             job_ids.append(job_id)
             
-            # Start background thread for each crawling job
-            thread = threading.Thread(
-                target=self._run_job_async,
-                args=(job_id, url, options, record.get("category", "general")),
-                daemon=True
+            # Submit job to class-level ThreadPoolExecutor to limit concurrency
+            self._executor.submit(
+                self._run_job_async,
+                job_id,
+                url,
+                options,
+                record.get("category", "general")
             )
-            thread.start()
             
         return job_ids
 

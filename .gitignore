@@ -58,3 +58,12 @@ chromadb_data/
 *.swp
 Thumbs.db
 .DS_Store
+
+# Generated crawler / dataset output (runtime data, not source code)
+/masterpieces/
+/prompt_templates/
+/backend/skills/*.yaml
+/backend/skills/*.yml
+/knowledge_input/
+test.db
+test_analytics.db

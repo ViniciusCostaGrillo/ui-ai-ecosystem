@@ -7,6 +7,9 @@ import time
 TEST_SCRIPTS = [
     "backend/utils/validate_env.py",
     "backend/utils/test_api.py",
+    "backend/utils/test_bulk_import.py",
+    "backend/utils/test_importer_engine.py",
+    "backend/utils/test_masterpiece_engine.py",
     "backend/utils/test_crawlers.py",
     "backend/utils/test_extractor.py",
     "backend/utils/test_vision.py",
